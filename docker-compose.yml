@@ -184,6 +184,7 @@ services:
         - "${NGINX_HOST_HTTPS_PORT}:443"
       depends_on:
         - php-fpm
+        - anaconda
       networks:
         - frontend
         - backend
@@ -710,3 +711,14 @@ services:
       ports:
         - 9010:9000
       
+### Anaconda ################################################
+    anaconda:
+      image: continuumio/anaconda3
+      expose:
+        - "8888"
+      volumes:
+        - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
+      networks:
+        - frontend
+        - backend
+      tty: true
