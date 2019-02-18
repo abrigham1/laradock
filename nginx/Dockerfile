@@ -20,9 +20,11 @@ RUN apk update \
 
 ARG PHP_UPSTREAM_CONTAINER=php-fpm
 ARG PHP_UPSTREAM_PORT=9000
+ARG ANACONDA_UPSTREAM_CONTAINER=anaconda
+ARG ANACONDA_UPSTREAM_PORT=5000
 
 # Set upstream conf and remove the default conf
-RUN echo "upstream php-upstream { server ${PHP_UPSTREAM_CONTAINER}:${PHP_UPSTREAM_PORT}; }" > /etc/nginx/conf.d/upstream.conf \
+RUN echo "upstream php-upstream { server ${PHP_UPSTREAM_CONTAINER}:${PHP_UPSTREAM_PORT}; } upstream mlapi-upstream { server ${ANACONDA_UPSTREAM_CONTAINER}:${ANACONDA_UPSTREAM_PORT}; }" > /etc/nginx/conf.d/upstream.conf \
     && rm /etc/nginx/conf.d/default.conf
 
 ADD ./startup.sh /opt/startup.sh
