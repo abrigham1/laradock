@@ -5,4 +5,4 @@ RUN pip install gunicorn
 
 WORKDIR /var/www/MovieReviewClassifier
 
-CMD ["gunicorn"  , "-b", "0.0.0.0:5000", "FlaskTest:app"]
+CMD ["gunicorn"  , "-b", "0.0.0.0:5000", "MovieReviewPredict:app"]
