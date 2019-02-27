@@ -7,7 +7,7 @@ networks:
     driver: ${NETWORKS_DRIVER}
 services:
 
-  ### Workspace Utilities ##################################
+### Workspace Utilities ##################################
   workspace:
     build:
       context: ./workspace
@@ -34,6 +34,7 @@ services:
         - INSTALL_NPM_BOWER=${WORKSPACE_INSTALL_NPM_BOWER}
         - INSTALL_NPM_VUE_CLI=${WORKSPACE_INSTALL_NPM_VUE_CLI}
         - INSTALL_DRUSH=${WORKSPACE_INSTALL_DRUSH}
+        - INSTALL_WP_CLI=${WORKSPACE_INSTALL_WP_CLI}
         - INSTALL_DRUPAL_CONSOLE=${WORKSPACE_INSTALL_DRUPAL_CONSOLE}
         - INSTALL_AEROSPIKE=${WORKSPACE_INSTALL_AEROSPIKE}
         - AEROSPIKE_PHP_REPOSITORY=${AEROSPIKE_PHP_REPOSITORY}
@@ -69,7 +70,7 @@ services:
         - BLACKFIRE_CLIENT_ID=${BLACKFIRE_CLIENT_ID}
         - BLACKFIRE_CLIENT_TOKEN=${BLACKFIRE_CLIENT_TOKEN}
     volumes:
-      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
+      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
     extra_hosts:
       - "dockerhost:${DOCKER_HOST_IP}"
     ports:
@@ -84,7 +85,7 @@ services:
     links:
       - docker-in-docker
 
-  ### PHP-FPM ##############################################
+### PHP-FPM ##############################################
   php-fpm:
     build:
       context: ./php-fpm
@@ -126,7 +127,7 @@ services:
         - INSTALL_YAML=${PHP_FPM_INSTALL_YAML}
     volumes:
       - ./php-fpm/php${PHP_VERSION}.ini:/usr/local/etc/php/php.ini
-      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
+      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
     expose:
       - "9000"
     extra_hosts:
@@ -142,31 +143,7 @@ services:
     links:
       - docker-in-docker
 
-  ### PHP Worker ############################################
-  php-worker:
-    build:
-      context: ./php-worker
-      args:
-        - PHP_VERSION=${PHP_VERSION}
-        - PHALCON_VERSION=${PHALCON_VERSION}
-        - INSTALL_PGSQL=${PHP_WORKER_INSTALL_PGSQL}
-        - INSTALL_BCMATH=${PHP_WORKER_INSTALL_BCMATH}
-        - INSTALL_PHALCON=${PHP_WORKER_INSTALL_PHALCON}
-        - INSTALL_SOAP=${PHP_WORKER_INSTALL_SOAP}
-        - INSTALL_ZIP_ARCHIVE=${PHP_WORKER_INSTALL_ZIP_ARCHIVE}
-        - PUID=${PHP_WORKER_PUID}
-        - PGID=${PHP_WORKER_PGID}
-    volumes:
-      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
-      - ./php-worker/supervisord.d:/etc/supervisord.d
-    depends_on:
-      - workspace
-    extra_hosts:
-      - "dockerhost:${DOCKER_HOST_IP}"
-    networks:
-      - backend
-
-  ### NGINX Server #########################################
+### NGINX Server #########################################
   nginx:
     build:
       context: ./nginx
@@ -175,7 +152,7 @@ services:
         - PHP_UPSTREAM_PORT=${NGINX_PHP_UPSTREAM_PORT}
         - CHANGE_SOURCE=${CHANGE_SOURCE}
     volumes:
-      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
+      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
       - ${NGINX_HOST_LOG_PATH}:/var/log/nginx
       - ${NGINX_SITES_PATH}:/etc/nginx/sites-available
       - ${NGINX_SSL_PATH}:/etc/nginx/ssl
@@ -189,84 +166,28 @@ services:
       - frontend
       - backend
 
-  ### Certbot #########################################
-  certbot:
-    build:
-      context: ./certbot
-    volumes:
-      - ./data/certbot/certs/:/var/certs
-      - ./certbot/letsencrypt/:/var/www/letsencrypt
-    environment:
-      - CN="fake.domain.com"
-      - EMAIL="fake.email@gmail.com"
-    networks:
-      - frontend
-
-  ### Caddy Server #########################################
-  caddy:
-    build: ./caddy
+### Docker-in-Docker ################################################
+  docker-in-docker:
+    image: docker:dind
+    privileged: true
     volumes:
       - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
-      - ${CADDY_CONFIG_PATH}:/etc/caddy
-      - ${CADDY_HOST_LOG_PATH}:/var/log/caddy
-      - ${DATA_PATH_HOST}:/root/.caddy
-    ports:
-      - "${CADDY_HOST_HTTP_PORT}:80"
-      - "${CADDY_HOST_HTTPS_PORT}:443"
-    depends_on:
-      - php-fpm
-    networks:
-      - frontend
-      - backend
-
-  ### AWS EB-CLI ################################################
-  aws:
-    build:
-      context: ./aws
-    volumes:
-      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
-    depends_on:
-      - workspace
-    tty: true
-
-  ### DOCKER-REGISTRY ################################################
-  docker-registry:
-    build:
-      context: ./docker-registry
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - ${DATA_PATH_HOST}/docker-registry:/var/lib/registry
-    ports:
-      - "${DOCKER_REGISTRY_PORT}:5000"
-    networks:
-      - backend
-
-  ### DOCKER-WEB-UI ################################################
-  docker-web-ui:
-    build:
-      context: ./docker-web-ui
-    environment:
-      - TZ=${WORKSPACE_TIMEZONE}
-      - ENV_DOCKER_REGISTRY_HOST=${DOCKER_WEBUI_REGISTRY_HOST}
-      - ENV_DOCKER_REGISTRY_PORT=${DOCKER_WEBUI_REGISTRY_PORT}
-      - ENV_DOCKER_REGISTRY_USE_SSL=${DOCKER_REGISTRY_USE_SSL}
-      - ENV_MODE_BROWSE_ONLY=${DOCKER_REGISTRY_BROWSE_ONLY}
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-    ports:
-      - "${DOCKER_WEBUI_PORT}:80"
-    networks:
-      - frontend
-      - backend
-
-  ### Anaconda ################################################
-  anaconda:
-    image: continuumio/anaconda3
     expose:
-      - "8888"
+      - 2375
+    networks:
+      - backend
+
+### ANACONDA ################################################
+  anaconda:
+    build:
+      context: ./anaconda
+    expose:
+      - "5000"
+    extra_hosts:
+      - "dockerhost:${DOCKER_HOST_IP}"
+    tty: true
     volumes:
-      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
+      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
     networks:
       - frontend
       - backend
-    tty: true
