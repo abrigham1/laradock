@@ -4,9 +4,9 @@ server {
     server_name abrigham.test;
 
     # For https
-    # listen 443 ssl;
-    # ssl_certificate /etc/nginx/ssl/default.crt;
-    # ssl_certificate_key /etc/nginx/ssl/default.key;
+    listen 443 ssl;
+    ssl_certificate /etc/nginx/ssl/default.crt;
+    ssl_certificate_key /etc/nginx/ssl/default.key;
 
     root /var/www/public;
     index index.php index.html index.htm;
