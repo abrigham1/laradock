@@ -1,7 +1,7 @@
 server {
 
     listen 80;
-    server_name mlapi.abrigham.localhost;
+    server_name mlapi.abrigham.test;
 
     # For https
     # listen 443 ssl;

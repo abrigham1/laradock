@@ -1,7 +1,7 @@
 server {
 
     listen 80;
-    server_name abrigham.localhost;
+    server_name abrigham.test;
 
     # For https
     # listen 443 ssl;
