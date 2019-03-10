@@ -2,7 +2,11 @@ FROM nginx:alpine
 
 LABEL maintainer="Mahmoud Zalt <mahmoud@zalt.me>"
 
-COPY nginx.conf /etc/nginx/
+# copy source code in (only used in production volume used in local development)
+COPY ./ /var/www
+COPY ./laradock/nginx/sites/ /etc/nginx/sites-available
+
+COPY ./laradock/nginx/nginx.conf /etc/nginx/
 
 # If you're in China, or you need to change sources, will be set CHANGE_SOURCE to true in .env.
 
@@ -27,7 +31,7 @@ ARG ANACONDA_UPSTREAM_PORT=5000
 RUN echo "upstream php-upstream { server ${PHP_UPSTREAM_CONTAINER}:${PHP_UPSTREAM_PORT}; } upstream mlapi-upstream { server ${ANACONDA_UPSTREAM_CONTAINER}:${ANACONDA_UPSTREAM_PORT}; }" > /etc/nginx/conf.d/upstream.conf \
     && rm /etc/nginx/conf.d/default.conf
 
-ADD ./startup.sh /opt/startup.sh
+COPY ./laradock/nginx/startup.sh /opt/startup.sh
 RUN sed -i 's/\r//g' /opt/startup.sh
 CMD ["/bin/bash", "/opt/startup.sh"]
 
