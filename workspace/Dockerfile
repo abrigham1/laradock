@@ -18,9 +18,6 @@ FROM laradock/workspace:2.2-${LARADOCK_PHP_VERSION}
 
 LABEL maintainer="Mahmoud Zalt <mahmoud@zalt.me>"
 
-# copy source code in (only used in production volume used in local development)
-COPY ./ /var/www
-
 ARG LARADOCK_PHP_VERSION
 
 # Set Environment Variables
@@ -84,8 +81,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 USER root
 
-COPY ./laradock/workspace/aliases.sh /root/aliases.sh
-COPY ./laradock/workspace/aliases.sh /home/laradock/aliases.sh
+COPY ./aliases.sh /root/aliases.sh
+COPY ./aliases.sh /home/laradock/aliases.sh
 
 RUN sed -i 's/\r//' /root/aliases.sh && \
     sed -i 's/\r//' /home/laradock/aliases.sh && \
@@ -109,7 +106,7 @@ RUN echo "" >> ~/.bashrc && \
 USER root
 
 # Add the composer.json
-COPY ./laradock/workspace/composer.json /home/laradock/.composer/composer.json
+COPY ./composer.json /home/laradock/.composer/composer.json
 
 # Make sure that ~/.composer belongs to laradock
 RUN chown -R laradock:laradock /home/laradock/.composer
@@ -152,7 +149,7 @@ RUN echo "" >> ~/.bashrc && \
 
 USER root
 
-COPY ./laradock/workspace/crontab /etc/cron.d
+COPY ./crontab /etc/cron.d
 
 RUN chmod -R 644 /etc/cron.d
 
@@ -282,7 +279,7 @@ RUN if [ ${INSTALL_XDEBUG} = true ]; then \
 ;fi
 
 # ADD for REMOTE debugging
-COPY ./laradock/workspace/xdebug.ini /etc/php/${LARADOCK_PHP_VERSION}/cli/conf.d/xdebug.ini
+COPY ./xdebug.ini /etc/php/${LARADOCK_PHP_VERSION}/cli/conf.d/xdebug.ini
 
 RUN sed -i "s/xdebug.remote_autostart=0/xdebug.remote_autostart=1/" /etc/php/${LARADOCK_PHP_VERSION}/cli/conf.d/xdebug.ini && \
     sed -i "s/xdebug.remote_enable=0/xdebug.remote_enable=1/" /etc/php/${LARADOCK_PHP_VERSION}/cli/conf.d/xdebug.ini && \
@@ -324,8 +321,8 @@ RUN if [ ${INSTALL_XDEBUG} = false -a ${INSTALL_BLACKFIRE} = true ]; then \
 
 ARG INSTALL_WORKSPACE_SSH=false
 
-COPY ./laradock/workspace/insecure_id_rsa /tmp/id_rsa
-COPY ./laradock/workspace/insecure_id_rsa.pub /tmp/id_rsa.pub
+COPY ./insecure_id_rsa /tmp/id_rsa
+COPY ./insecure_id_rsa.pub /tmp/id_rsa.pub
 
 RUN if [ ${INSTALL_WORKSPACE_SSH} = true ]; then \
     rm -f /etc/service/sshd/down && \
@@ -743,7 +740,7 @@ RUN set -eux; if [ ${INSTALL_MSSQL} = true ]; then \
 
 USER root
 
-COPY ./laradock/workspace/mc/config.json /root/.mc/config.json
+COPY ./mc/config.json /root/.mc/config.json
 
 ARG INSTALL_MC=false
 

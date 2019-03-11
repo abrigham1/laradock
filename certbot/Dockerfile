@@ -2,9 +2,7 @@ FROM phusion/baseimage:latest
 
 LABEL maintainer="Mahmoud Zalt <mahmoud@zalt.me>"
 
-COPY ./laradock/certbot/run-certbot.sh /root/certbot/run-certbot.sh
-
-COPY ./laradock/certbot/letsencrypt/ /var/www/letsencrypt
+COPY run-certbot.sh /root/certbot/run-certbot.sh
 
 RUN apt-get update
 RUN apt-get install -y letsencrypt

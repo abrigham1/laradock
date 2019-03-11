@@ -15,8 +15,7 @@ services:
 ### Workspace Utilities ##################################
     workspace:
       build:
-        context: ../
-        dockerfile: laradock/workspace/Dockerfile
+        context: ./workspace
         args:
           - LARADOCK_PHP_VERSION=${PHP_VERSION}
           - LARADOCK_PHALCON_VERSION=${PHALCON_VERSION}
@@ -93,8 +92,7 @@ services:
 ### PHP-FPM ##############################################
     php-fpm:
       build:
-        context: ../
-        dockerfile: laradock/php-fpm/Dockerfile
+        context: ./php-fpm
         args:
           - LARADOCK_PHP_VERSION=${PHP_VERSION}
           - LARADOCK_PHALCON_VERSION=${PHALCON_VERSION}
@@ -151,8 +149,7 @@ services:
 ### NGINX Server #########################################
     nginx:
       build:
-        context: ../
-        dockerfile: laradock/nginx/Dockerfile
+        context: ./nginx
         args:
           - PHP_UPSTREAM_CONTAINER=${NGINX_PHP_UPSTREAM_CONTAINER}
           - PHP_UPSTREAM_PORT=${NGINX_PHP_UPSTREAM_PORT}
@@ -175,8 +172,7 @@ services:
 ### Caddy Server #########################################
     caddy:
       build:
-        context: ../
-        dockerfile: laradock/caddy/Dockerfile
+        context: ./caddy
       volumes:
         - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
         - ${CADDY_CONFIG_PATH}:/etc/caddy
@@ -194,8 +190,7 @@ services:
 ### Certbot #########################################
     certbot:
       build:
-        context: ../
-        dockerfile: laradock/certbot/Dockerfile
+        context: ./certbot
       volumes:
         - ./data/certbot/certs/:/var/certs
         - ./certbot/letsencrypt/:/var/www/letsencrypt
@@ -207,9 +202,7 @@ services:
 
 ### Docker-in-Docker ################################################
     docker-in-docker:
-      build:
-        context: ../
-        dockerfile: laradock/docker-in-docker/Dockerfile
+      image: docker:dind
       privileged: true
       volumes:
         - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
@@ -221,8 +214,7 @@ services:
  ### ANACONDA ################################################
     anaconda:
       build:
-        context: ../
-        dockerfile: laradock/anaconda/Dockerfile
+        context: ./anaconda
       expose:
         - "5000"
       extra_hosts:

@@ -2,10 +2,6 @@ FROM golang:alpine
 
 LABEL maintainer="Huadong Zuo <admin@zuohuadong.cn>"
 
-# copy source code in (only used in production volume used in local development)
-COPY ./ /var/www
-COPY ./laradock/caddy/caddy/ /etc/caddy
-
 RUN apk add --no-cache \
     openssh \
     git \

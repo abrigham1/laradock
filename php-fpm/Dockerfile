@@ -18,10 +18,6 @@ FROM laradock/php-fpm:2.2-${LARADOCK_PHP_VERSION}
 
 LABEL maintainer="Mahmoud Zalt <mahmoud@zalt.me>"
 
-# copy source code in (only used in production volume used in local development)
-COPY ./ /var/www
-COPY ./laradock/php-fpm/php7.2.ini /usr/local/etc/php/php.ini
-
 ARG LARADOCK_PHP_VERSION
 
 # Set Environment Variables
@@ -138,7 +134,7 @@ RUN if [ ${INSTALL_XDEBUG} = true ]; then \
 ;fi
 
 # Copy xdebug configuration for remote debugging
-COPY ./laradock/php-fpm/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
+COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 
 RUN sed -i "s/xdebug.remote_autostart=0/xdebug.remote_autostart=1/" /usr/local/etc/php/conf.d/xdebug.ini && \
     sed -i "s/xdebug.remote_enable=0/xdebug.remote_enable=1/" /usr/local/etc/php/conf.d/xdebug.ini && \
@@ -395,7 +391,7 @@ RUN if [ ${INSTALL_OPCACHE} = true ]; then \
 ;fi
 
 # Copy opcache configration
-COPY ./laradock/php-fpm/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+COPY ./opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
 ###########################################################################
 # Mysqli Modifications:
@@ -544,7 +540,7 @@ ARG LARADOCK_PHALCON_VERSION
 ENV LARADOCK_PHALCON_VERSION ${LARADOCK_PHALCON_VERSION}
 
 # Copy phalcon configration
-COPY ./laradock/php-fpm/phalcon.ini /usr/local/etc/php/conf.d/phalcon.ini.disable
+COPY ./phalcon.ini /usr/local/etc/php/conf.d/phalcon.ini.disable
 
 RUN if [ $INSTALL_PHALCON = true ]; then \
     apt-get update && apt-get install -y unzip libpcre3-dev gcc make re2c \
@@ -601,8 +597,8 @@ RUN php -v | head -n 1 | grep -q "PHP ${LARADOCK_PHP_VERSION}."
 #--------------------------------------------------------------------------
 #
 
-COPY ./laradock/php-fpm/laravel.ini /usr/local/etc/php/conf.d
-COPY ./laradock/php-fpm/xlaravel.pool.conf /usr/local/etc/php-fpm.d/
+COPY ./laravel.ini /usr/local/etc/php/conf.d
+COPY ./xlaravel.pool.conf /usr/local/etc/php-fpm.d/
 
 USER root
 
