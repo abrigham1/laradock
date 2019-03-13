@@ -195,8 +195,8 @@ services:
         - ./data/certbot/certs/:/var/certs
         - ./certbot/letsencrypt/:/var/www/letsencrypt
       environment:
-        - CN="fake.domain.com"
-        - EMAIL="fake.email@gmail.com"
+        - CN="abrigham.com"
+        - EMAIL="abrigham1@gmail.com"
       networks:
         - frontend
 
