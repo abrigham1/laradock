@@ -175,36 +175,6 @@ services:
         - frontend
         - backend
 
-### Caddy Server #########################################
-    caddy:
-      build: ./caddy
-      volumes:
-        - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
-        - ${CADDY_CONFIG_PATH}:/etc/caddy
-        - ${CADDY_HOST_LOG_PATH}:/var/log/caddy
-        - ${DATA_PATH_HOST}:/root/.caddy
-      ports:
-        - "${CADDY_HOST_HTTP_PORT}:80"
-        - "${CADDY_HOST_HTTPS_PORT}:443"
-      depends_on:
-        - php-fpm
-      networks:
-        - frontend
-        - backend
-
-### Certbot #########################################
-    certbot:
-      build:
-        context: ./certbot
-      volumes:
-        - ./data/certbot/certs/:/var/certs
-        - ./certbot/letsencrypt/:/var/www/letsencrypt
-      environment:
-        - CN="abrigham.com"
-        - EMAIL="abrigham1@gmail.com"
-      networks:
-        - frontend
-
 ### Docker-in-Docker ################################################
     docker-in-docker:
       image: docker:dind
