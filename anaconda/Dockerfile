@@ -1,7 +1,13 @@
 FROM continuumio/anaconda3
 
 # install gunicorn to serve the flask app
-RUN pip install gunicorn
+RUN conda install -c anaconda gunicorn
+
+#install flask
+RUN conda install -c anaconda flask
+
+# install flask-cors
+RUN conda install -c anaconda flask-cors
 
 WORKDIR /var/www/MovieReviewClassifier
 
