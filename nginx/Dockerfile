@@ -14,20 +14,30 @@ RUN if [ ${CHANGE_SOURCE} = true ]; then \
 
 RUN apk update \
     && apk upgrade \
+    && apk --update add logrotate \
     && apk add --no-cache openssl \
-    && apk add --no-cache bash \
-    && adduser -D -H -u 1000 -s /bin/bash www-data
+    && apk add --no-cache bash
+
+RUN set -x ; \
+    addgroup -g 82 -S www-data ; \
+    adduser -u 82 -D -S -G www-data www-data && exit 0 ; exit 1
 
 ARG PHP_UPSTREAM_CONTAINER=php-fpm
 ARG PHP_UPSTREAM_PORT=9000
 ARG ANACONDA_UPSTREAM_CONTAINER=anaconda
 ARG ANACONDA_UPSTREAM_PORT=5000
 
+# Create 'messages' file used from 'logrotate'
+RUN touch /var/log/messages
+
+# Copy 'logrotate' config file
+COPY logrotate/nginx /etc/logrotate.d/
+
 # Set upstream conf and remove the default conf
 RUN echo "upstream php-upstream { server ${PHP_UPSTREAM_CONTAINER}:${PHP_UPSTREAM_PORT}; } upstream mlapi-upstream { server ${ANACONDA_UPSTREAM_CONTAINER}:${ANACONDA_UPSTREAM_PORT}; }" > /etc/nginx/conf.d/upstream.conf \
     && rm /etc/nginx/conf.d/default.conf
 
-COPY ./startup.sh /opt/startup.sh
+ADD ./startup.sh /opt/startup.sh
 RUN sed -i 's/\r//g' /opt/startup.sh
 CMD ["/bin/bash", "/opt/startup.sh"]
 
