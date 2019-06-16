@@ -186,7 +186,7 @@ services:
       networks:
         - backend
 
- ### ANACONDA ################################################
+### ANACONDA ################################################
     anaconda:
       build:
         context: ./anaconda
@@ -200,3 +200,18 @@ services:
       networks:
         - frontend
         - backend
+
+### Selenium ###############################################
+    selenium:
+      build: ./selenium
+      ports:
+        - "${SELENIUM_PORT}:4444"
+      volumes:
+        - /dev/shm:/dev/shm
+      depends_on:
+        - nginx
+      links:
+        - nginx:abrigham.test
+        - nginx:mlapi.abrigham.test
+      networks:
+        - frontend
