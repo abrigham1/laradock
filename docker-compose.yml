@@ -282,8 +282,6 @@ services:
       - "${SELENIUM_PORT}:4444"
     volumes:
       - /dev/shm:/dev/shm
-    depends_on:
-      - nginx
     links:
       - nginx:abrigham.test
       - nginx:mlapi.abrigham.test
