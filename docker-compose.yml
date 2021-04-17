@@ -7,8 +7,6 @@ networks:
     driver: ${NETWORKS_DRIVER}
 
 volumes:
-  caddy:
-    driver: ${VOLUMES_DRIVER}
   mysql:
     driver: ${VOLUMES_DRIVER}
   docker-in-docker:
