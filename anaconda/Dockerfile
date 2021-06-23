@@ -1,4 +1,4 @@
-FROM continuumio/anaconda3
+FROM continuumio/anaconda3:2021.04
 
 # install gunicorn to serve the flask app
 RUN /opt/conda/bin/conda install -c anaconda gunicorn
